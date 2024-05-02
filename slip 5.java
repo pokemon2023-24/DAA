@@ -108,3 +108,82 @@ public class KruskalsMST {
 //Q.2) Write a program to implement Huffman Code using greedy methods and also calculate the
 //best case and worst-case complexity. 
 
+import java.util.*;
+
+class HuffmanNode implements Comparable<HuffmanNode> {
+    char data;
+    int frequency;
+    HuffmanNode left, right;
+
+    public HuffmanNode(char data, int frequency) {
+        this.data = data;
+        this.frequency = frequency;
+        left = right = null;
+    }
+
+    @Override
+    public int compareTo(HuffmanNode node) {
+        return this.frequency - node.frequency;
+    }
+}
+
+public class HuffmanCode {
+    public static void main(String[] args) {
+        String text = "this is an example for huffman encoding";
+
+        Map<Character, Integer> frequencyMap = new HashMap<>();
+        for (char c : text.toCharArray()) {
+            frequencyMap.put(c, frequencyMap.getOrDefault(c, 0) + 1);
+        }
+
+        PriorityQueue<HuffmanNode> priorityQueue = new PriorityQueue<>();
+        for (Map.Entry<Character, Integer> entry : frequencyMap.entrySet()) {
+            priorityQueue.add(new HuffmanNode(entry.getKey(), entry.getValue()));
+        }
+
+        while (priorityQueue.size() > 1) {
+            HuffmanNode left = priorityQueue.poll();
+            HuffmanNode right = priorityQueue.poll();
+
+            HuffmanNode combinedNode = new HuffmanNode('\0', left.frequency + right.frequency);
+            combinedNode.left = left;
+            combinedNode.right = right;
+            priorityQueue.add(combinedNode);
+        }
+
+        HuffmanNode root = priorityQueue.poll();
+        Map<Character, String> huffmanCodes = new HashMap<>();
+        generateCodes(root, "", huffmanCodes);
+
+        System.out.println("Huffman Codes:");
+        for (Map.Entry<Character, String> entry : huffmanCodes.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+
+        int textLength = text.length();
+        int bitLength = 0;
+        for (char c : text.toCharArray()) {
+            bitLength += huffmanCodes.get(c).length();
+        }
+
+        System.out.println("Original text length: " + textLength);
+        System.out.println("Encoded text length: " + bitLength);
+        
+        // Calculating best-case and worst-case complexity
+        // Best-case: O(n log n), where n is the number of unique characters
+        // Worst-case: O(n log n), where n is the number of unique characters
+        System.out.println("Best-case complexity: O(n log n)");
+        System.out.println("Worst-case complexity: O(n log n)");
+    }
+
+    private static void generateCodes(HuffmanNode root, String code, Map<Character, String> huffmanCodes) {
+        if (root == null) return;
+        if (root.left == null && root.right == null) {
+            huffmanCodes.put(root.data, code);
+        }
+        generateCodes(root.left, code + "0", huffmanCodes);
+        generateCodes(root.right, code + "1", huffmanCodes);
+    }
+}
+
+/*any text enter*/
